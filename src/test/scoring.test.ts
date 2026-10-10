@@ -25,7 +25,7 @@ describe("scoring", () => {
     expect(r.completeness).toBeCloseTo(0.6);
   });
   it("placement readiness ignores missing mock interview", () => {
-    expect(placementReadiness({ ...base, mockInterview: null }).completeness).toBeCloseTo(0.75);
+    expect(placementReadiness({ ...base, mockInterview: null }).completeness).toBeCloseTo(0.6);
   });
   it("flags attendance below 75%", () => {
     expect(evaluate({ ...base, attendance: 70 }).flags.map((f) => f.key)).toContain("attendance");

@@ -1,7 +1,7 @@
 import { Link, Outlet } from "@tanstack/react-router";
 import { useState } from "react";
-import { Activity, BarChart3, Briefcase, Database, FlaskConical, LayoutDashboard, LifeBuoy, Menu, Shapes, Users, X } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { Activity, BarChart3, BrainCircuit, Briefcase, Database, FlaskConical, LayoutDashboard, LifeBuoy, Menu, Shapes, Users, X } from "lucide-react";
+import { DATASET_LABEL, useStore } from "@/lib/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -12,12 +12,13 @@ const NAV = [
   { to: "/placement", label: "Placement Readiness", icon: Briefcase },
   { to: "/segments", label: "Segmentation", icon: Shapes },
   { to: "/interventions", label: "Risk & Interventions", icon: LifeBuoy },
+  { to: "/predictions", label: "ML Predictions", icon: BrainCircuit },
   { to: "/simulator", label: "What-If Simulator", icon: FlaskConical },
   { to: "/data", label: "CSV Import & Reports", icon: Database },
 ] as const;
 
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
-  const { views, hasImported } = useStore();
+  const { views, dataset, model } = useStore();
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 py-6">
@@ -37,8 +38,8 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
       <div className="m-3 rounded-xl border border-sidebar-border bg-sidebar-accent/60 p-3 text-xs">
-        <p className="font-semibold text-sidebar-accent-foreground">{hasImported ? "Imported dataset" : "Synthetic demo data"}</p>
-        <p className="mt-1 text-sidebar-foreground/70">{views.length} fictional student records. Risk flags are rule-based, not ML predictions.</p>
+        <p className="font-semibold text-sidebar-accent-foreground">{DATASET_LABEL[dataset]}</p>
+        <p className="mt-1 text-sidebar-foreground/70">{views.length} student records. Risk flags are rule-based; {model ? "ML predictions use a trained logistic-regression model." : "no ML model (dataset has no labels)."}</p>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
+import { StudentPicker } from "./StudentPicker";
 import { INTERVENTION_STATUSES, INTERVENTION_TYPES, type Intervention } from "@/lib/types";
 
 export function InterventionDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<Intervention> }) {
@@ -32,10 +33,7 @@ export function InterventionDialog({ open, onOpenChange, initial }: { open: bool
         <div className="grid gap-4">
           <div className="grid gap-1.5">
             <Label>Student</Label>
-            <Select value={f.studentId} onValueChange={(v) => setF({ ...f, studentId: v })}>
-              <SelectTrigger><SelectValue placeholder="Select student" /></SelectTrigger>
-              <SelectContent className="max-h-72">{views.map((s) => <SelectItem key={s.id} value={s.id}>{s.id} · {s.name}</SelectItem>)}</SelectContent>
-            </Select>
+            <StudentPicker value={f.studentId} onChange={(v) => setF((p) => ({ ...p, studentId: v }))} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">

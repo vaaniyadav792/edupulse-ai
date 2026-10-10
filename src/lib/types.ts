@@ -18,6 +18,9 @@ export interface Student {
   softSkills: Num;
   placementTraining: Num; // % sessions attended
   certifications: Num; // count
+  courseCompletion?: Num; // % of LMS course content completed
+  placementAssessment?: Num; // overall placement readiness assessment 0-100 (if provided)
+  atRiskLabel?: Num; // historical ground-truth label 0/1 used to train the ML model
   source: "synthetic" | "imported";
 }
 
@@ -43,6 +46,7 @@ export interface StudentView extends Student {
   flags: RiskFlag[];
   academicRisk: AcademicRisk;
   lowPlacement: boolean;
+  mlRisk: Num; // ML-predicted probability of being at risk (0-1), null if no model
 }
 
 export const INTERVENTION_TYPES = [

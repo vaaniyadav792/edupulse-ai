@@ -3,10 +3,11 @@ import { useMemo, useState } from "react";
 import { FlaskConical, RotateCcw } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Card, CategoryBadge, Empty, PageHeader, fmt, tooltipStyle } from "@/components/app/ui-bits";
 import { useStore } from "@/lib/store";
+import { predict } from "@/lib/ml";
+import { StudentPicker } from "@/components/app/StudentPicker";
 import { COMPONENT_LABELS, evaluate, WEIGHTS, type ComponentKey } from "@/lib/scoring";
 import type { Student } from "@/lib/types";
 
@@ -34,7 +35,7 @@ const SLIDERS: { key: SimKey; label: string; max: number; unit: string }[] = [
 ];
 
 function Simulator() {
-  const { views, students } = useStore();
+  const { views, students, model } = useStore();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const id = search.id && views.some((v) => v.id === search.id) ? search.id : views[0]?.id;
@@ -57,10 +58,7 @@ function Simulator() {
       <div className="mb-4 flex items-center gap-2 rounded-xl border border-cyan/40 bg-cyan/10 px-4 py-2.5 text-sm"><FlaskConical className="h-4 w-4 text-cyan" /> <b>Hypothetical scenario.</b> Uses the exact same scoring formulas as the dashboard.</div>
       <div className="grid gap-6 lg:grid-cols-5">
         <Card title="Adjust indicators" className="lg:col-span-2">
-          <Select value={id ?? ""} onValueChange={(v) => { setOver({}); navigate({ to: ".", search: { id: v } }); }}>
-            <SelectTrigger className="mb-5"><SelectValue /></SelectTrigger>
-            <SelectContent className="max-h-72">{views.map((s) => <SelectItem key={s.id} value={s.id}>{s.id} · {s.name} ({s.department})</SelectItem>)}</SelectContent>
-          </Select>
+          <div className="mb-5"><StudentPicker value={id ?? ""} onChange={(v) => { setOver({}); navigate({ to: ".", search: { id: v } }); }} /></div>
           <div className="space-y-5">
             {SLIDERS.map((sl) => {
               const orig = original[sl.key];
@@ -90,6 +88,7 @@ function Simulator() {
           <Card title="Category & risk">
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <CategoryBadge c={before.category} /> → <CategoryBadge c={after.category} />
+              {model && <span className="text-muted-foreground">ML risk: {(predict(model, original) * 100).toFixed(1)}% → <b className="text-foreground">{(predict(model, { ...original, ...over }) * 100).toFixed(1)}%</b></span>}
               <span className="ml-auto text-muted-foreground">Risk flags: {before.flags.length} → <b className="text-foreground">{after.flags.length}</b></span>
             </div>
             {after.flags.length > 0 && <p className="mt-3 text-xs text-muted-foreground">Remaining: {after.flags.map((f) => f.label).join(", ")}</p>}

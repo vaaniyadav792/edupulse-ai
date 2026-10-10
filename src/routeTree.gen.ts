@@ -14,6 +14,7 @@ import { Route as AcademicsRouteImport } from './routes/academics'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as InterventionsRouteImport } from './routes/interventions'
 import { Route as PlacementRouteImport } from './routes/placement'
+import { Route as PredictionsRouteImport } from './routes/predictions'
 import { Route as SegmentsRouteImport } from './routes/segments'
 import { Route as SimulatorRouteImport } from './routes/simulator'
 import { Route as StudentsIndexRouteImport } from './routes/students.index'
@@ -44,6 +45,11 @@ const PlacementRoute = PlacementRouteImport.update({
   path: '/placement',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PredictionsRoute = PredictionsRouteImport.update({
+  id: '/predictions',
+  path: '/predictions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SegmentsRoute = SegmentsRouteImport.update({
   id: '/segments',
   path: '/segments',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/data': typeof DataRoute
   '/interventions': typeof InterventionsRoute
   '/placement': typeof PlacementRoute
+  '/predictions': typeof PredictionsRoute
   '/segments': typeof SegmentsRoute
   '/simulator': typeof SimulatorRoute
   '/students/$id': typeof StudentsIdRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/data': typeof DataRoute
   '/interventions': typeof InterventionsRoute
   '/placement': typeof PlacementRoute
+  '/predictions': typeof PredictionsRoute
   '/segments': typeof SegmentsRoute
   '/simulator': typeof SimulatorRoute
   '/students/$id': typeof StudentsIdRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/data': typeof DataRoute
   '/interventions': typeof InterventionsRoute
   '/placement': typeof PlacementRoute
+  '/predictions': typeof PredictionsRoute
   '/segments': typeof SegmentsRoute
   '/simulator': typeof SimulatorRoute
   '/students/$id': typeof StudentsIdRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/interventions'
     | '/placement'
+    | '/predictions'
     | '/segments'
     | '/simulator'
     | '/students/$id'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/interventions'
     | '/placement'
+    | '/predictions'
     | '/segments'
     | '/simulator'
     | '/students/$id'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/interventions'
     | '/placement'
+    | '/predictions'
     | '/segments'
     | '/simulator'
     | '/students/$id'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   DataRoute: typeof DataRoute
   InterventionsRoute: typeof InterventionsRoute
   PlacementRoute: typeof PlacementRoute
+  PredictionsRoute: typeof PredictionsRoute
   SegmentsRoute: typeof SegmentsRoute
   SimulatorRoute: typeof SimulatorRoute
   StudentsIdRoute: typeof StudentsIdRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlacementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/predictions': {
+      id: '/predictions'
+      path: '/predictions'
+      fullPath: '/predictions'
+      preLoaderRoute: typeof PredictionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/segments': {
       id: '/segments'
       path: '/segments'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   DataRoute: DataRoute,
   InterventionsRoute: InterventionsRoute,
   PlacementRoute: PlacementRoute,
+  PredictionsRoute: PredictionsRoute,
   SegmentsRoute: SegmentsRoute,
   SimulatorRoute: SimulatorRoute,
   StudentsIdRoute: StudentsIdRoute,

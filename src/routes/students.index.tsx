@@ -18,10 +18,10 @@ export const Route = createFileRoute("/students/")({
   component: StudentsPage,
 });
 
-type Key = "id" | "department" | "year" | "cgpa" | "attendance" | "success" | "academicRisk" | "readiness";
+type Key = "id" | "department" | "year" | "cgpa" | "attendance" | "success" | "academicRisk" | "readiness" | "mlRisk";
 const COLS: { key: Key; label: string }[] = [
   { key: "id", label: "Student" }, { key: "department", label: "Dept" }, { key: "year", label: "Year" }, { key: "cgpa", label: "CGPA" },
-  { key: "attendance", label: "Attendance" }, { key: "success", label: "Success Score" }, { key: "academicRisk", label: "Academic risk" }, { key: "readiness", label: "Placement" },
+  { key: "attendance", label: "Attendance" }, { key: "success", label: "Success Score" }, { key: "academicRisk", label: "Academic risk" }, { key: "readiness", label: "Placement" }, { key: "mlRisk", label: "ML risk" },
 ];
 const riskOrder = { High: 3, Moderate: 2, Low: 1 };
 
@@ -84,6 +84,7 @@ function StudentsPage() {
                       <td className="px-3"><div className="flex items-center gap-2"><b>{fmt(s.success, 1)}</b><CategoryBadge c={s.category} /></div></td>
                       <td className="px-3"><RiskBadge r={s.academicRisk} /></td>
                       <td className="px-3">{fmt(s.readiness, 0)}</td>
+                      <td className="px-3">{s.mlRisk === null ? "—" : `${(s.mlRisk * 100).toFixed(0)}%`}</td>
                     </tr>
                   ))}
                 </tbody>
