@@ -19,8 +19,8 @@ export const Route = createFileRoute("/segments")({
 
 function Segments() {
   const { filtered } = useStore();
-  const [open, setOpen] = useState(SEGMENTS[0].id);
-  const seg = SEGMENTS.find((s) => s.id === open) ?? SEGMENTS[0];
+  const [open, setOpen] = useState(SEGMENTS[0]!.id);
+  const seg = SEGMENTS.find((s) => s.id === open) ?? SEGMENTS[0]!;
   const members = filtered.filter(seg.test);
 
   return (

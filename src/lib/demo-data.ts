@@ -23,7 +23,7 @@ export function generateDemoStudents(count = 120): Student[] {
   const c = (v: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
   const out: Student[] = [];
   for (let i = 0; i < count; i++) {
-    const dept = DEPARTMENTS[i % DEPARTMENTS.length];
+    const dept = DEPARTMENTS[i % DEPARTMENTS.length]!;
     const year = 1 + (Math.floor(i / DEPARTMENTS.length) % 4);
     const ability = g();
     const diligence = g();

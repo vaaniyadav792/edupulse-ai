@@ -70,9 +70,9 @@ function Placement() {
   );
 }
 
-function StudentList({ title, subtitle, rows }: { title: string; subtitle?: string; rows: { id: string; name: string; department: string; cgpa: number | null; readiness: number | null }[] }) {
+function StudentList({ title, subtitle, rows }: { title: string; subtitle?: string | undefined; rows: { id: string; name: string; department: string; cgpa: number | null; readiness: number | null }[] }) {
   return (
-    <Card title={title} subtitle={subtitle}>
+    <Card title={title} {...(subtitle ? { subtitle } : {})}>
       {rows.length === 0 ? <Empty title="None in this view" hint="" /> : (
         <ul className="divide-y">
           {rows.map((s) => (
