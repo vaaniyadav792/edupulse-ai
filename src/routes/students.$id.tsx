@@ -21,7 +21,7 @@ export const Route = createFileRoute("/students/$id")({
   component: Profile,
 });
 
-const RLABEL: Record<keyof typeof READINESS_WEIGHTS, string> = { aptitude: "Aptitude", coding: "Coding", mockInterview: "Mock interview", softSkills: "Soft skills", placementTraining: "Placement training" };
+const RLABEL: Record<keyof typeof READINESS_WEIGHTS, string> = { placementAssessment: "Placement assessment", aptitude: "Aptitude", coding: "Coding", mockInterview: "Mock interview", softSkills: "Soft skills", placementTraining: "Placement training" };
 
 function Profile() {
   const { id } = Route.useParams();
@@ -52,7 +52,9 @@ function Profile() {
           <p className="mt-4 text-sm opacity-90">Data completeness: {(s.completeness * 100).toFixed(0)}% of score weight available{ s.completeness < 1 && " — missing components were renormalized out"}.</p>
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
             <div><p className="opacity-75">Placement readiness</p><p className="text-xl font-bold">{fmt(s.readiness, 0)}</p></div>
-            <div><p className="opacity-75">Academic risk</p><p className="mt-1"><span className="rounded-full bg-card px-1 py-0.5"><RiskBadge r={s.academicRisk} /></span></p></div>
+            <div><p className="opacity-75">ML risk probability</p><p className="text-xl font-bold">{s.mlRisk === null ? "n/a" : `${(s.mlRisk * 100).toFixed(1)}%`}</p></div>
+            <div><p className="opacity-75">Recorded label</p><p className="text-xl font-bold">{s.atRiskLabel === 1 ? "At risk" : s.atRiskLabel === 0 ? "Not at risk" : "—"}</p></div>
+            <div><p className="opacity-75">Academic risk (rules)</p><p className="mt-1"><span className="rounded-full bg-card px-1 py-0.5"><RiskBadge r={s.academicRisk} /></span></p></div>
           </div>
         </Card>
 
@@ -79,7 +81,7 @@ function Profile() {
 
         <Card title="Indicators" className="lg:col-span-1">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-            {[["CGPA", fmt(s.cgpa, 2)], ["Previous CGPA", fmt(s.prevCgpa, 2)], ["Backlogs", fmt(s.backlogs)], ["Attendance", s.attendance === null ? "—" : `${s.attendance}%`], ["Assignments", s.assignmentCompletion === null ? "—" : `${s.assignmentCompletion}%`], ["LMS logins/mo", fmt(s.lmsLogins)], ["Engagement", fmt(s.engagement)], ["Certifications", fmt(s.certifications)]].map(([k, v]) => (
+            {[["CGPA", fmt(s.cgpa, 2)], ["Previous CGPA", fmt(s.prevCgpa, 2)], ["Backlogs", fmt(s.backlogs)], ["Attendance", s.attendance === null ? "—" : `${s.attendance}%`], ["Assignments", s.assignmentCompletion === null ? "—" : `${s.assignmentCompletion}%`], ["LMS logins/mo", fmt(s.lmsLogins)], ["Engagement", fmt(s.engagement)], ["Certifications", fmt(s.certifications)], ["Course completion", s.courseCompletion == null ? "—" : `${s.courseCompletion}%`]].map(([k, v]) => (
               <div key={k}><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-semibold">{v}</dd></div>
             ))}
           </dl>
@@ -88,7 +90,7 @@ function Profile() {
         <Card title="Placement readiness inputs" subtitle={`Completeness ${(s.readinessCompleteness * 100).toFixed(0)}%`}>
           <div className="space-y-3">
             {(Object.keys(RLABEL) as (keyof typeof RLABEL)[]).map((k) => (
-              <div key={k}><div className="mb-1 flex justify-between text-sm"><span>{RLABEL[k]}</span><b>{s[k] === null ? <span className="text-muted-foreground">missing</span> : s[k]}</b></div><Meter value={s[k]} color="var(--cyan)" /></div>
+              <div key={k}><div className="mb-1 flex justify-between text-sm"><span>{RLABEL[k]}</span><b>{s[k] == null ? <span className="text-muted-foreground">missing</span> : s[k]}</b></div><Meter value={s[k] ?? null} color="var(--cyan)" /></div>
             ))}
           </div>
         </Card>

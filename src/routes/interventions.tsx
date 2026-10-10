@@ -26,6 +26,7 @@ function Interventions() {
   const { filtered, interventions, views, saveIntervention, deleteIntervention } = useStore();
   const [dlg, setDlg] = useState<Partial<Intervention> | null>(null);
   const [status, setStatus] = useState<string>("all");
+  const [limit, setLimit] = useState(40);
   const flagged = useMemo(() => filtered.filter((s) => s.flags.length > 0).sort((a, b) => b.flags.length - a.flags.length), [filtered]);
   const list = interventions.filter((i) => status === "all" || i.status === status);
   const nameOf = (id: string) => views.find((v) => v.id === id)?.name ?? "Unknown (not in dataset)";
@@ -40,7 +41,7 @@ function Interventions() {
           <FilterBar />
           {flagged.length === 0 ? <Card><Empty title="No flagged students" hint="Nobody in this view triggers a risk rule." /></Card> : (
             <div className="grid gap-4 md:grid-cols-2">
-              {flagged.map((s) => (
+              {flagged.slice(0, limit).map((s) => (
                 <Card key={s.id}>
                   <div className="mb-3 flex items-start justify-between">
                     <div><Link to="/students/$id" params={{ id: s.id }} className="font-semibold text-primary hover:underline">{s.id} · {s.name}</Link><p className="text-xs text-muted-foreground">{s.department} · Year {s.year}</p></div>
@@ -57,6 +58,7 @@ function Interventions() {
                   </ul>
                 </Card>
               ))}
+              {limit < flagged.length && <button className="text-sm font-medium text-primary hover:underline md:col-span-2" onClick={() => setLimit(limit + 40)}>Show more ({flagged.length - limit} remaining)</button>}
             </div>
           )}
         </TabsContent>

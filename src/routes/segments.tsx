@@ -46,7 +46,7 @@ function Segments() {
             <table className="w-full text-sm">
               <thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="py-2">Student</th><th>Dept</th><th>CGPA</th><th>Attendance</th><th>LMS</th><th>Readiness</th><th>Score</th></tr></thead>
               <tbody>
-                {members.map((s) => (
+                {members.slice(0, 150).map((s) => (
                   <tr key={s.id} className="border-b last:border-0 hover:bg-accent/50">
                     <td className="py-2"><Link to="/students/$id" params={{ id: s.id }} className="font-semibold text-primary hover:underline">{s.id}</Link> <span className="text-xs text-muted-foreground">{s.name}</span></td>
                     <td>{s.department}</td><td>{fmt(s.cgpa, 2)}</td><td>{fmt(s.attendance)}%</td><td>{fmt(s.lmsLogins)}</td><td>{fmt(s.readiness)}</td>
@@ -55,6 +55,7 @@ function Segments() {
                 ))}
               </tbody>
             </table>
+            {members.length > 150 && <p className="mt-2 text-xs text-muted-foreground">Showing 150 of {members.length}. Export the full list from CSV Import & Reports.</p>}
           </div>
         )}
       </Card>
