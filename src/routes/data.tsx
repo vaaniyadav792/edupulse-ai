@@ -50,7 +50,7 @@ function DataPage() {
     } finally { setLoading(false); }
   };
 
-  const missingRequired = FIELDS.filter((f) => f.required && (mapping[f.key] === undefined || mapping[f.key] < 0));
+  const missingRequired = FIELDS.filter((f) => f.required && (mapping[f.key] ?? -1) < 0);
   const results = file && missingRequired.length === 0 ? file.rows.map((r) => validateRow(r, mapping)) : [];
   // duplicate detection
   const seen = new Set(mode === "append" ? students.map((s) => s.id) : []);

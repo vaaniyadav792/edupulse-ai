@@ -22,7 +22,9 @@ interface Store {
   hasImported: boolean;
 }
 
-const Ctx = createContext<Store | null>(null);
+// Keep one context instance across hot reloads so provider and consumers always match.
+const g = globalThis as { __edupulseCtx?: ReturnType<typeof createContext<Store | null>> };
+const Ctx = (g.__edupulseCtx ??= createContext<Store | null>(null));
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
