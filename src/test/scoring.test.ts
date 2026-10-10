@@ -5,7 +5,7 @@ import type { Student } from "@/lib/types";
 
 const base: Student = {
   id: "T1", name: "T", department: "CSE", year: 3, cgpa: 8, prevCgpa: 8, backlogs: 0, attendance: 80,
-  assignmentCompletion: 80, lmsLogins: 40, engagement: 80, aptitude: 80, coding: 80, mockInterview: 80,
+  assignmentCompletion: 80, lmsLogins: 32, engagement: 80, aptitude: 80, coding: 80, mockInterview: 80,
   softSkills: 80, placementTraining: 80, certifications: 4, source: "synthetic",
 };
 
