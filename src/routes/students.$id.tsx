@@ -122,7 +122,7 @@ function Profile() {
           )}
         </Card>
       </div>
-      <InterventionDialog open={!!dlg} onOpenChange={(o) => !o && setDlg(null)} initial={dlg ?? undefined} />
+      <InterventionDialog open={!!dlg} onOpenChange={(o) => !o && setDlg(null)} {...(dlg ? { initial: dlg } : {})} />
     </>
   );
 }

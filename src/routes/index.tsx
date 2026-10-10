@@ -25,7 +25,7 @@ function Overview() {
   const { filtered } = useStore();
   const d = useMemo(() => {
     const buckets = Array.from({ length: 10 }, (_, i) => ({ range: `${i * 10}-${i * 10 + 9}`, count: 0, mid: i * 10 + 5 }));
-    filtered.forEach((s) => { if (s.success !== null) buckets[Math.min(9, Math.floor(s.success / 10))].count++; });
+    filtered.forEach((s) => { if (s.success !== null) buckets[Math.min(9, Math.floor(s.success / 10))]!.count++; });
     const depts = [...new Set(filtered.map((s) => s.department))].sort().map((dep) => {
       const g = filtered.filter((s) => s.department === dep);
       return { dept: dep, success: +(mean(g.map((s) => s.success)) ?? 0).toFixed(1), readiness: +(mean(g.map((s) => s.readiness)) ?? 0).toFixed(1) };

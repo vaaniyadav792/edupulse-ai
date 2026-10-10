@@ -11,7 +11,7 @@ import { COMPONENT_LABELS, evaluate, WEIGHTS, type ComponentKey } from "@/lib/sc
 import type { Student } from "@/lib/types";
 
 export const Route = createFileRoute("/simulator")({
-  validateSearch: (s: Record<string, unknown>): { id?: string } => (typeof s.id === "string" ? { id: s.id } : {}),
+  validateSearch: (s: Record<string, unknown>): { id?: string } => (typeof s["id"] === "string" ? { id: s["id"] } : {}),
   head: () => ({
     meta: [
       { title: "What-If Simulator — EduPulse AI" },
@@ -57,7 +57,7 @@ function Simulator() {
       <div className="mb-4 flex items-center gap-2 rounded-xl border border-cyan/40 bg-cyan/10 px-4 py-2.5 text-sm"><FlaskConical className="h-4 w-4 text-cyan" /> <b>Hypothetical scenario.</b> Uses the exact same scoring formulas as the dashboard.</div>
       <div className="grid gap-6 lg:grid-cols-5">
         <Card title="Adjust indicators" className="lg:col-span-2">
-          <Select value={id} onValueChange={(v) => { setOver({}); navigate({ to: ".", search: { id: v } }); }}>
+          <Select value={id ?? ""} onValueChange={(v) => { setOver({}); navigate({ to: ".", search: { id: v } }); }}>
             <SelectTrigger className="mb-5"><SelectValue /></SelectTrigger>
             <SelectContent className="max-h-72">{views.map((s) => <SelectItem key={s.id} value={s.id}>{s.id} · {s.name} ({s.department})</SelectItem>)}</SelectContent>
           </Select>

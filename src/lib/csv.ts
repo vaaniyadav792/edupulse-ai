@@ -80,7 +80,7 @@ export function autoMap(headers: string[]): Record<string, number> {
 
 export function validateRow(row: string[], mapping: Record<string, number>): { student: Student | null; errors: string[] } {
   const errors: string[] = [];
-  const s: Record<string, unknown> = { source: "imported" };
+  const s: any = { source: "imported" }; // eslint-disable-line @typescript-eslint/no-explicit-any
   for (const f of FIELDS) {
     const idx = mapping[f.key];
     const raw = idx === undefined || idx < 0 ? "" : (row[idx] ?? "").trim();

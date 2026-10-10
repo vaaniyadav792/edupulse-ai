@@ -42,7 +42,7 @@ function DataPage() {
       const rows = parseCSV(await f.text());
       if (rows.length < 2) throw new Error("The file needs a header row and at least one data row.");
       if (rows.length > 5001) throw new Error("Maximum 5,000 rows per import.");
-      const headers = rows[0].map((h) => h.trim());
+      const headers = rows[0]!.map((h) => h.trim());
       setFile({ name: f.name, headers, rows: rows.slice(1) });
       setMapping(autoMap(headers));
     } catch (e) {
@@ -134,7 +134,7 @@ function DataPage() {
                       <tr key={i} className={cn("border-t", results[i]?.errors.length && "bg-destructive/5")}>
                         <td className="p-2 text-muted-foreground">{i + 2}</td>
                         {file.headers.map((_, j) => <td key={j} className="p-2">{r[j]}</td>)}
-                        <td className="p-2">{results[i]?.errors.length ? <span className="text-destructive">{results[i].errors.join("; ")}</span> : <span className="text-ontrack">OK</span>}</td>
+                        <td className="p-2">{results[i]?.errors.length ? <span className="text-destructive">{results[i]!.errors.join("; ")}</span> : <span className="text-ontrack">OK</span>}</td>
                       </tr>
                     ))}
                   </tbody>
