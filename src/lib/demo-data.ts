@@ -60,17 +60,17 @@ export function generateDemoStudents(count = 120): Student[] {
   return out;
 }
 
-export function demoInterventions(): Intervention[] {
-  const base: [string, Intervention["type"], string, Intervention["status"], string][] = [
-    ["STU1003", "Attendance Follow-up", "Dr. K. Varma", "In Progress", "Called guardian; weekly check-ins started."],
-    ["STU1010", "Academic Mentoring", "Prof. S. Pillai", "Planned", "Review mid-term results together."],
-    ["STU1021", "Coding Practice", "Ms. A. Kulkarni", "In Progress", "Assigned 20 DSA problems on the practice portal."],
-    ["STU1034", "Mock Interview Prep", "Mr. R. Thomas", "Completed", "Two mock rounds done; communication improved."],
-    ["STU1047", "Tutoring", "Dr. P. Ghosh", "Planned", "Remedial maths sessions, Tue/Thu."],
+export function demoInterventions(ids: string[]): Intervention[] {
+  const base: [number, Intervention["type"], string, Intervention["status"], string][] = [
+    [2, "Attendance Follow-up", "Dr. K. Varma", "In Progress", "Called guardian; weekly check-ins started."],
+    [9, "Academic Mentoring", "Prof. S. Pillai", "Planned", "Review mid-term results together."],
+    [20, "Coding Practice", "Ms. A. Kulkarni", "In Progress", "Assigned 20 DSA problems on the practice portal."],
+    [33, "Mock Interview Prep", "Mr. R. Thomas", "Completed", "Two mock rounds done; communication improved."],
+    [46, "Tutoring", "Dr. P. Ghosh", "Planned", "Remedial maths sessions, Tue/Thu."],
   ];
-  return base.map(([studentId, type, mentor, status, notes], i) => ({
+  return base.filter(([n]) => ids[n]).map(([n, type, mentor, status, notes], i) => ({
     id: `INT-${100 + i}`,
-    studentId,
+    studentId: ids[n]!,
     type,
     mentor,
     status,

@@ -146,3 +146,13 @@ export function templateCSV() {
     ["STU9001", "Sample Student", "CSE", 3, 7.8, 7.5, 0, 88, 92, 30, 75, 70, 82, 68, 74, 85, 3],
   ]);
 }
+
+/** Full pipeline: parse → normalize known schema → auto-map → validate. */
+export function studentsFromCSVText(text: string) {
+  const raw = parseCSV(text);
+  if (raw.length < 2) throw new Error("The file needs a header row and at least one data row.");
+  const n = normalizeKnownSchema(raw[0]!.map((h) => h.trim()), raw.slice(1));
+  const mapping = autoMap(n.headers);
+  const res = n.rows.map((r) => validateRow(r, mapping));
+  return { students: res.flatMap((r) => (r.student ? [r.student] : [])), invalid: res.filter((r) => !r.student).length };
+}
