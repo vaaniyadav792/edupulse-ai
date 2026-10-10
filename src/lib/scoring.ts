@@ -19,11 +19,12 @@ export const COMPONENT_LABELS: Record<ComponentKey, string> = {
 };
 
 export const READINESS_WEIGHTS = {
-  aptitude: 0.25,
-  coding: 0.25,
-  mockInterview: 0.25,
-  softSkills: 0.15,
+  aptitude: 0.2,
+  coding: 0.2,
+  mockInterview: 0.2,
+  softSkills: 0.1,
   placementTraining: 0.1,
+  placementAssessment: 0.2,
 } as const;
 
 export const THRESHOLDS = {
@@ -62,6 +63,7 @@ export function components(s: Partial<Student>): Record<ComponentKey, Num> {
   const academic = has(s.cgpa) ? clamp(s.cgpa * 10 - Math.min((s.backlogs ?? 0) * 5, 20)) : null;
   const lmsParts = [
     has(s.assignmentCompletion) ? clamp(s.assignmentCompletion) : null,
+    has(s.courseCompletion) ? clamp(s.courseCompletion) : null,
     has(s.lmsLogins) ? clamp((s.lmsLogins / 40) * 100) : null,
   ].filter(has);
   return {
@@ -141,6 +143,7 @@ export function evaluate(s: Student): StudentView {
     flags,
     academicRisk: academicRiskLevel(flags),
     lowPlacement: pr.score !== null && pr.score < THRESHOLDS.readiness,
+    mlRisk: null,
   };
 }
 

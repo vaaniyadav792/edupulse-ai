@@ -40,8 +40,12 @@ export function download(filename: string, content: string) {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.rel = "noopener";
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+  // Revoke later: revoking immediately cancels the download in some browsers.
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 type FieldKey = Exclude<keyof Student, "source">;
@@ -65,7 +69,41 @@ export const FIELDS: FieldDef[] = [
   { key: "softSkills", label: "Soft skills (0–100)", type: "number", min: 0, max: 100, aliases: ["softskills", "soft"] },
   { key: "placementTraining", label: "Placement training %", type: "number", min: 0, max: 100, aliases: ["placementtraining", "training"] },
   { key: "certifications", label: "Certifications (count)", type: "number", min: 0, max: 50, aliases: ["certifications", "certs"] },
+  { key: "courseCompletion", label: "Course completion %", type: "number", min: 0, max: 100, aliases: ["coursecompletion", "coursecompletionpercentage"] },
+  { key: "placementAssessment", label: "Placement assessment (0–100)", type: "number", min: 0, max: 100, aliases: ["placementassessment", "placementreadinessscore", "placementscore"] },
+  { key: "atRiskLabel", label: "At-risk label (0/1, for ML training)", type: "number", min: 0, max: 1, aliases: ["atrisklabel", "atrisk", "label"] },
 ];
+
+/**
+ * Recognises the "Student Journey Analytics" export format and converts it to the
+ * app's canonical columns. Sensitive columns (age, financial aid, fee status,
+ * wellbeing) are deliberately dropped and never used for scoring or ML.
+ */
+export function normalizeKnownSchema(headers: string[], rows: string[][]): { headers: string[]; rows: string[][]; detected: string | null } {
+  const idx = (h: string) => headers.findIndex((x) => x.trim() === h);
+  if (idx("Internal_Assessment_1") < 0 || idx("Semester") < 0 || idx("Student_ID") < 0) return { headers, rows, detected: null };
+  const num = (r: string[], h: string) => { const i = idx(h); const v = i < 0 ? NaN : Number(r[i]); return Number.isNaN(v) || r[i]?.trim() === "" ? null : v; };
+  const out = ["id", "name", "department", "year", "cgpa", "prevCgpa", "attendance", "assignmentCompletion", "lmsLogins", "courseCompletion", "engagement", "placementAssessment", "placementTraining", "atRiskLabel"];
+  const r1 = (v: number | null, d = 1) => (v === null ? "" : String(+v.toFixed(d)));
+  const mapped = rows.map((r) => {
+    const sem = num(r, "Semester");
+    const ia1 = num(r, "Internal_Assessment_1"), ia2 = num(r, "Internal_Assessment_2"), end = num(r, "End_Semester_Exam_Score");
+    const cgpa = ia1 !== null && ia2 !== null && end !== null ? (0.2 * ia1 + 0.2 * ia2 + 0.6 * end) / 10 : null;
+    const logins = num(r, "LMS_Logins_Per_Week");
+    const hours = num(r, "Extracurricular_Hours_Per_Month");
+    const part = (r[idx("Extracurricular_Participation")] ?? "").trim().toLowerCase() === "yes";
+    const engagement = hours === null ? null : Math.min(100, (part ? 30 : 0) + hours * 7);
+    const sessions = num(r, "Placement_Sessions_Attended");
+    const id = (r[idx("Student_ID")] ?? "").trim();
+    return [
+      id, id, (r[idx("Department")] ?? "").trim(), sem === null ? "" : String(Math.min(5, Math.ceil(sem / 2))),
+      r1(cgpa, 2), r1(num(r, "Previous_Semester_GPA_10"), 2), r1(num(r, "Attendance_Percentage")), r1(num(r, "Assignment_Average")),
+      logins === null ? "" : String(logins * 4), r1(num(r, "Course_Completion_Percentage")), r1(engagement),
+      r1(num(r, "Placement_Readiness_Score")), sessions === null ? "" : String(Math.min(100, sessions * 12.5)), r1(num(r, "At_Risk_Label"), 0),
+    ];
+  });
+  return { headers: out, rows: mapped, detected: "Student Journey Analytics" };
+}
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
