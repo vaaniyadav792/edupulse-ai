@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, PageHeader } from "@/components/app/ui-bits";
-import { useStore } from "@/lib/store";
-import { autoMap, download, FIELDS, parseCSV, templateCSV, toCSV, validateRow } from "@/lib/csv";
+import { DATASET_LABEL, useStore } from "@/lib/store";
+import { autoMap, download, FIELDS, normalizeKnownSchema, parseCSV, templateCSV, toCSV, validateRow } from "@/lib/csv";
 import type { Student } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/data")({
 interface Parsed { name: string; headers: string[]; rows: string[][] }
 
 function DataPage() {
-  const { views, filtered, students, importStudents, resetDemo, hasImported } = useStore();
+  const { views, filtered, students, importStudents, loadBundled, loadSynthetic, dataset } = useStore();
   const [file, setFile] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,9 +42,10 @@ function DataPage() {
       const rows = parseCSV(await f.text());
       if (rows.length < 2) throw new Error("The file needs a header row and at least one data row.");
       if (rows.length > 5001) throw new Error("Maximum 5,000 rows per import.");
-      const headers = rows[0]!.map((h) => h.trim());
-      setFile({ name: f.name, headers, rows: rows.slice(1) });
-      setMapping(autoMap(headers));
+      const n = normalizeKnownSchema(rows[0]!.map((h) => h.trim()), rows.slice(1));
+      if (n.detected) toast.info(`Recognised ${n.detected} format; sensitive columns are excluded.`);
+      setFile({ name: f.name, headers: n.headers, rows: n.rows });
+      setMapping(autoMap(n.headers));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read file.");
     } finally { setLoading(false); }
@@ -79,8 +80,11 @@ function DataPage() {
 
   return (
     <>
-      <PageHeader title="CSV Import & Reports" subtitle={`Current dataset: ${views.length} students (${hasImported ? "includes imported records" : "synthetic demo data"}).`}
-        actions={<Button variant="outline" onClick={() => { resetDemo(); toast.success("Restored synthetic demo data"); }}><RotateCcw className="h-4 w-4" /> Reset to demo data</Button>} />
+      <PageHeader title="CSV Import & Reports" subtitle={`Current dataset: ${views.length} students (${DATASET_LABEL[dataset]}).`}
+        actions={<>
+          <Button variant="outline" onClick={async () => { await loadBundled(); toast.success("Loaded Student Journey dataset"); }}><RotateCcw className="h-4 w-4" /> Load bundled dataset</Button>
+          <Button variant="ghost" onClick={() => { loadSynthetic(); toast.success("Loaded synthetic demo data"); }}>Synthetic demo</Button>
+        </>} />
       <div className="grid gap-6 lg:grid-cols-3">
         <Card title="1. Upload CSV" className="lg:col-span-2" action={<Button size="sm" variant="ghost" onClick={() => download("edupulse-template.csv", templateCSV())}><Download className="h-4 w-4" /> Template</Button>}>
           <label className={cn("flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition hover:border-primary hover:bg-accent/40", loading && "opacity-60")}>
@@ -95,6 +99,7 @@ function DataPage() {
           <div className="space-y-2">
             <Button variant="outline" className="w-full justify-start" onClick={exportScores}><Download className="h-4 w-4" /> Student scores ({filtered.length})</Button>
             <Button variant="outline" className="w-full justify-start" onClick={exportRisk}><Download className="h-4 w-4" /> Risk & actions report</Button>
+            <Button variant="outline" className="w-full justify-start" onClick={() => download("edupulse-ml-predictions.csv", toCSV([["id", "department", "year", "ml_risk_probability", "rule_based_risk", "recorded_label"], ...filtered.map((s) => [s.id, s.department, s.year, s.mlRisk === null ? "" : s.mlRisk.toFixed(4), s.academicRisk, s.atRiskLabel ?? ""])]))}><Download className="h-4 w-4" /> ML predictions report</Button>
           </div>
         </Card>
       </div>
